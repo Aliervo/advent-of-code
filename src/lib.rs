@@ -53,11 +53,40 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     first.sort();
     second.sort();
 
+    let cloned = first.clone();
+    let also_cloned = second.clone();
+
+    // for number in cloned {
+    //     println!("{number}");
+    //     let mut count = 0;
+    //     for spot in &also_cloned {
+    //         if *spot == number {
+    //             count += 1;
+    //         }
+    //     }
+    //     println!("Matched {count} times");
+    // }
+
+    let similarity: u32 = cloned
+        .iter()
+        .map(|x| {
+            let mut count = 0;
+            for num in &also_cloned {
+                if num == x {
+                    count += 1;
+                }
+            }
+            x * count
+        })
+        .sum();
+
+    println!("Similarity: {similarity}");
+
     let zipped = first.iter().zip(second.iter());
 
     let distance: u32 = zipped.map(|(a, b)| a.abs_diff(*b)).sum();
 
-    println!("{distance}");
+    println!("Distance: {distance}");
 
     Ok(())
 }
