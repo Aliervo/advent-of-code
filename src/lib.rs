@@ -75,6 +75,10 @@ fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
     }
 }
 
+fn is_safe(list: &str) -> bool {
+    true
+}
+
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
@@ -90,10 +94,53 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         }
         2 => {
             println!("Let's hear it for day 2!");
-            lines.for_each(|line| println!("{line}"));
+            let total_safe = lines.fold(0, |acc, line| acc + is_safe(line) as u8);
+
+            println!("There were {total_safe} safe lines");
         }
         day => println!("No logic for day {day}"),
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn safe_line() {
+        let result = is_safe("7 6 4 2 1");
+        assert_eq!(true, result);
+    }
+
+    #[test]
+    fn increases_too_quickly() {
+        let result = is_safe("1 2 7 8 9");
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn decreases_too_quickly() {
+        let result = is_safe("9 7 6 2 1");
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn direction_change() {
+        let result = is_safe("1 3 2 4 5");
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn no_direction() {
+        let result = is_safe("8 6 4 4 1");
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn increase_by_3() {
+        let result = is_safe("1 3 6 7 9");
+        assert_eq!(true, result);
+    }
 }
