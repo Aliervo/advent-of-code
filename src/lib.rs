@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fs;
 
 pub struct Config {
-    pub day: String,
+    pub day: u8,
     pub file_path: String,
 }
 
@@ -11,7 +11,7 @@ impl Config {
         args.next(); // We don't need the name of the program
 
         let day = match args.next() {
-            Some(arg) => arg,
+            Some(arg) => arg.parse::<u8>().expect("Day must be a number"),
             None => return Err("Didn't get a day"),
         };
 
@@ -24,54 +24,42 @@ impl Config {
     }
 }
 
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path)?;
+struct ListStats {
+    distance: u32,
+    similarity: u32,
+}
 
-    // println!("With text:\n{contents}");
-
+fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
     // Split into two vectors
-    let iter = contents.split('\n');
-    let mut first: Vec<u32> = [].to_vec();
-    let mut second: Vec<u32> = [].to_vec();
+    let mut first: Vec<u32> = Vec::new();
+    let mut second: Vec<u32> = Vec::new();
 
-    for line in iter {
-        // println! {"{line}"};
-
-        if line != "" {
-            let mut words = line.split_whitespace();
-            match words.next() {
-                Some(word) => first.push(word.parse::<u32>().unwrap()),
-                None => return Err("There's nothing here".into()),
-            }
-            match words.next() {
-                Some(word) => second.push(word.parse::<u32>().unwrap()),
-                None => return Err("There's nothing here".into()),
-            }
-        }
+    for line in lines {
+        let mut words = line.split_whitespace();
+        first.push(
+            words
+                .next()
+                .expect("The line was blank")
+                .parse::<u32>()
+                .expect("That wasn't a number"),
+        );
+        second.push(
+            words
+                .next()
+                .expect("The line was blank")
+                .parse::<u32>()
+                .expect("That wasn't a number"),
+        );
     }
 
     first.sort();
     second.sort();
 
-    let cloned = first.clone();
-    let also_cloned = second.clone();
-
-    // for number in cloned {
-    //     println!("{number}");
-    //     let mut count = 0;
-    //     for spot in &also_cloned {
-    //         if *spot == number {
-    //             count += 1;
-    //         }
-    //     }
-    //     println!("Matched {count} times");
-    // }
-
-    let similarity: u32 = cloned
+    let similarity: u32 = first
         .iter()
         .map(|x| {
             let mut count = 0;
-            for num in &also_cloned {
+            for num in &second {
                 if num == x {
                     count += 1;
                 }
@@ -80,13 +68,34 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         })
         .sum();
 
-    println!("Similarity: {similarity}");
-
     let zipped = first.iter().zip(second.iter());
 
     let distance: u32 = zipped.map(|(a, b)| a.abs_diff(*b)).sum();
 
-    println!("Distance: {distance}");
+    ListStats {
+        distance,
+        similarity,
+    }
+}
+
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(config.file_path)?;
+
+    // Split the file into an iterator containing all the lines of the file;
+    let lines = contents.split_terminator('\n');
+
+    match config.day {
+        1 => {
+            let stats = day_1(lines);
+
+            println!("Distance: {}", stats.distance);
+            println!("Similarity: {}", stats.similarity);
+        }
+        2 => {
+            println!("Let's hear it for day 2!");
+        }
+        day => println!("No logic for day {day}"),
+    }
 
     Ok(())
 }
