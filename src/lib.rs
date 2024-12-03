@@ -70,7 +70,7 @@ fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
 
     let zipped = first.iter().zip(second.iter());
 
-    let distance: u32 = zipped.map(|(a, b)| a.abs_diff(*b)).sum();
+    let distance: u32 = zipped.fold(0, |acc, (a, b)| acc + a.abs_diff(*b));
 
     ListStats {
         distance,
