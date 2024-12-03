@@ -89,7 +89,7 @@ fn is_safe(list: &str) -> bool {
 /// Returns true if all numbers are either increasing or decreasing
 /// Repeated numbers are neither, return false on them
 fn same_direction(list: &Vec<u8>) -> bool {
-    list.is_sorted_by(|a, b| a > b) || list.is_sorted()
+    list.is_sorted_by(|a, b| a > b) || list.is_sorted_by(|a, b| a < b)
 }
 
 /// Returns true if each adjacent number differs by at least one and at most 3
@@ -152,6 +152,12 @@ mod tests {
     #[test]
     fn no_direction() {
         let result = is_safe("8 6 4 4 1");
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn ends_without_direction() {
+        let result = is_safe("1 3 6 8 8");
         assert_eq!(false, result);
     }
 
