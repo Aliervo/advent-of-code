@@ -75,15 +75,20 @@ fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
     }
 }
 
-fn is_safe(list: &str) -> bool {
-    // split the string into a vector for further processing
-    let numbers: Vec<u8> = list
-        .split_whitespace()
+fn parse_list(list: &str) -> Vec<u8> {
+    list.split_whitespace()
         .map(|x| x.parse::<u8>().expect("That wasn't a number"))
-        .collect();
+        .collect()
+}
+fn is_safe(numbers: &Vec<u8>) -> bool {
+    // split the string into a vector for further processing
+    // let numbers: Vec<u8> = list
+    //     .split_whitespace()
+    //     .map(|x| x.parse::<u8>().expect("That wasn't a number"))
+    //     .collect();
 
     // Check both conditions
-    same_direction(&numbers) && correct_velocity(&numbers)
+    same_direction(numbers) && correct_velocity(numbers)
 }
 
 /// Returns true if all numbers are either increasing or decreasing
@@ -97,8 +102,19 @@ fn correct_velocity(list: &Vec<u8>) -> bool {
     list.windows(2).all(|w| w[0].abs_diff(w[1]) <= 3)
 }
 
-fn dampened(list: &str) -> bool {
-    true
+fn dampened(numbers: &Vec<u8>) -> bool {
+    // let numbers: Vec<u8> = list
+    //     .split_whitespace()
+    //     .map(|x| x.parse::<u8>().expect("That wasn't a number"))
+    //     .collect();
+
+    numbers.iter().any(|n| {
+        let mut nums = numbers.iter();
+        let pos = nums.position(|x| x == n);
+        let mut vec = numbers.clone();
+        vec.remove(pos.expect("That wasn't a number"));
+        is_safe(&vec.to_vec())
+    })
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
@@ -116,7 +132,8 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         }
         2 => {
             let total_safe = lines.fold(0, |acc, line| {
-                acc + (is_safe(line) || dampened(line)) as u32
+                let vec = parse_list(line);
+                acc + (is_safe(&vec) || dampened(&vec)) as u32
             });
 
             println!("There were {total_safe} safe lines");
