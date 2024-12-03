@@ -76,7 +76,25 @@ fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
 }
 
 fn is_safe(list: &str) -> bool {
-    true
+    // split the string into a vector for further processing
+    let numbers: Vec<u8> = list
+        .split_whitespace()
+        .map(|x| x.parse::<u8>().expect("That wasn't a number"))
+        .collect();
+
+    // Check both conditions
+    same_direction(&numbers) && correct_velocity(&numbers)
+}
+
+/// Returns true if all numbers are either increasing or decreasing
+/// Repeated numbers are neither, return false on them
+fn same_direction(list: &Vec<u8>) -> bool {
+    list.is_sorted_by(|a, b| a > b) || list.is_sorted()
+}
+
+/// Returns true if each adjacent number differs by at least one and at most 3
+fn correct_velocity(list: &Vec<u8>) -> bool {
+    list.windows(2).all(|w| w[0].abs_diff(w[1]) <= 3)
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
@@ -93,8 +111,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             println!("Similarity: {}", stats.similarity);
         }
         2 => {
-            println!("Let's hear it for day 2!");
-            let total_safe = lines.fold(0, |acc, line| acc + is_safe(line) as u8);
+            let total_safe = lines.fold(0, |acc, line| acc + is_safe(line) as u32);
 
             println!("There were {total_safe} safe lines");
         }
@@ -109,7 +126,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn safe_line() {
+    fn decreasing() {
         let result = is_safe("7 6 4 2 1");
         assert_eq!(true, result);
     }
