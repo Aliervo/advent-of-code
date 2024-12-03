@@ -97,6 +97,10 @@ fn correct_velocity(list: &Vec<u8>) -> bool {
     list.windows(2).all(|w| w[0].abs_diff(w[1]) <= 3)
 }
 
+fn dampened(list: &str) -> bool {
+    true
+}
+
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
@@ -111,7 +115,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             println!("Similarity: {}", stats.similarity);
         }
         2 => {
-            let total_safe = lines.fold(0, |acc, line| acc + is_safe(line) as u32);
+            let total_safe = lines.fold(0, |acc, line| {
+                acc + (is_safe(line) || dampened(line)) as u32
+            });
 
             println!("There were {total_safe} safe lines");
         }
@@ -165,5 +171,17 @@ mod tests {
     fn increase_by_3() {
         let result = is_safe("1 3 6 7 9");
         assert_eq!(true, result);
+    }
+
+    #[test]
+    fn can_dampen() {
+        let result = dampened("1 3 2 4 5");
+        assert_eq!(true, result);
+    }
+
+    #[test]
+    fn cannot_dampen() {
+        let result = dampened("9 7 6 2 1");
+        assert_eq!(false, result);
     }
 }
