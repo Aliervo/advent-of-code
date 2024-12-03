@@ -98,11 +98,9 @@ fn correct_velocity(list: &Vec<u8>) -> bool {
 
 fn dampened(numbers: &Vec<u8>) -> bool {
     // println!("Attempting to dampen: {:?}", numbers);
-    // let extra_copy = numbers.clone();
-    numbers.iter().any(|n| {
+    numbers.iter().enumerate().any(|(i, _)| {
         let mut vec = numbers.clone();
-        let pos = &numbers.iter().position(|x| x == n);
-        vec.remove(pos.expect("That wasn't a valid position"));
+        vec.remove(i);
         // println!("  Checking {:?}", vec);
         is_safe(&vec.to_vec())
     })
