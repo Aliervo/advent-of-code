@@ -55,18 +55,15 @@ fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
     first.sort();
     second.sort();
 
-    let similarity: u32 = first
-        .iter()
-        .map(|x| {
-            let mut count = 0;
-            for num in &second {
-                if num == x {
-                    count += 1;
-                }
+    let similarity: u32 = first.iter().fold(0, |acc, x| {
+        let mut count = 0;
+        for num in &second {
+            if num == x {
+                count += 1;
             }
-            x * count
-        })
-        .sum();
+        }
+        x * count + acc
+    });
 
     let zipped = first.iter().zip(second.iter());
 
@@ -93,6 +90,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         }
         2 => {
             println!("Let's hear it for day 2!");
+            lines.for_each(|line| println!("{line}"));
         }
         day => println!("No logic for day {day}"),
     }
