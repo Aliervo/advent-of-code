@@ -80,14 +80,8 @@ fn parse_list(list: &str) -> Vec<u8> {
         .map(|x| x.parse::<u8>().expect("That wasn't a number"))
         .collect()
 }
-fn is_safe(numbers: &Vec<u8>) -> bool {
-    // split the string into a vector for further processing
-    // let numbers: Vec<u8> = list
-    //     .split_whitespace()
-    //     .map(|x| x.parse::<u8>().expect("That wasn't a number"))
-    //     .collect();
 
-    // Check both conditions
+fn is_safe(numbers: &Vec<u8>) -> bool {
     same_direction(numbers) && correct_velocity(numbers)
 }
 
@@ -103,16 +97,13 @@ fn correct_velocity(list: &Vec<u8>) -> bool {
 }
 
 fn dampened(numbers: &Vec<u8>) -> bool {
-    // let numbers: Vec<u8> = list
-    //     .split_whitespace()
-    //     .map(|x| x.parse::<u8>().expect("That wasn't a number"))
-    //     .collect();
-
+    // println!("Attempting to dampen: {:?}", numbers);
+    // let extra_copy = numbers.clone();
     numbers.iter().any(|n| {
-        let mut nums = numbers.iter();
-        let pos = nums.position(|x| x == n);
         let mut vec = numbers.clone();
-        vec.remove(pos.expect("That wasn't a number"));
+        let pos = &numbers.iter().position(|x| x == n);
+        vec.remove(pos.expect("That wasn't a valid position"));
+        // println!("  Checking {:?}", vec);
         is_safe(&vec.to_vec())
     })
 }
@@ -191,7 +182,7 @@ mod tests {
     }
 
     #[test]
-    fn can_dampen() {
+    fn dampen_out_of_order() {
         let result = dampened(&parse_list("1 3 2 4 5"));
         assert_eq!(true, result);
     }
@@ -200,5 +191,23 @@ mod tests {
     fn cannot_dampen() {
         let result = dampened(&parse_list("9 7 6 2 1"));
         assert_eq!(false, result);
+    }
+
+    #[test]
+    fn cannot_dampen_2() {
+        let result = dampened(&parse_list("1 2 7 8 9"));
+        assert_eq!(false, result);
+    }
+
+    #[test]
+    fn dampen_repeat() {
+        let result = dampened(&parse_list("8 6 4 4 1"));
+        assert_eq!(true, result);
+    }
+
+    #[test]
+    fn dampen_end_out_of_order() {
+        let result = dampened(&parse_list("1 3 6 8 6"));
+        assert_eq!(true, result);
     }
 }
