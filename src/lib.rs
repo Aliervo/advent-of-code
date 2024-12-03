@@ -150,55 +150,55 @@ mod tests {
 
     #[test]
     fn decreasing() {
-        let result = is_safe("7 6 4 2 1");
+        let result = is_safe(&parse_list("7 6 4 2 1"));
         assert_eq!(true, result);
     }
 
     #[test]
     fn increases_too_quickly() {
-        let result = is_safe("1 2 7 8 9");
+        let result = is_safe(&parse_list("1 2 7 8 9"));
         assert_eq!(false, result);
     }
 
     #[test]
     fn decreases_too_quickly() {
-        let result = is_safe("9 7 6 2 1");
+        let result = is_safe(&parse_list("9 7 6 2 1"));
         assert_eq!(false, result);
     }
 
     #[test]
     fn direction_change() {
-        let result = is_safe("1 3 2 4 5");
+        let result = is_safe(&parse_list("1 3 2 4 5"));
         assert_eq!(false, result);
     }
 
     #[test]
     fn no_direction() {
-        let result = is_safe("8 6 4 4 1");
+        let result = is_safe(&parse_list("8 6 4 4 1"));
         assert_eq!(false, result);
     }
 
     #[test]
     fn ends_without_direction() {
-        let result = is_safe("1 3 6 8 8");
+        let result = is_safe(&parse_list("1 3 6 8 8"));
         assert_eq!(false, result);
     }
 
     #[test]
     fn increase_by_3() {
-        let result = is_safe("1 3 6 7 9");
+        let result = is_safe(&parse_list("1 3 6 7 9"));
         assert_eq!(true, result);
     }
 
     #[test]
     fn can_dampen() {
-        let result = dampened("1 3 2 4 5");
+        let result = dampened(&parse_list("1 3 2 4 5"));
         assert_eq!(true, result);
     }
 
     #[test]
     fn cannot_dampen() {
-        let result = dampened("9 7 6 2 1");
+        let result = dampened(&parse_list("9 7 6 2 1"));
         assert_eq!(false, result);
     }
 }
