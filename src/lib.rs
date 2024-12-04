@@ -49,7 +49,11 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
             println!("There were {total_safe} safe lines");
         }
-        3 => println!("Day 3, let's go!"),
+        3 => {
+            let total = day_3::sum_of_multiplied(day_3::find_tuples(&contents));
+
+            println!("The total is {total}");
+        }
         day => println!("No logic for day {day}"),
     }
 
