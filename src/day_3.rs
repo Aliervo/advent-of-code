@@ -48,4 +48,18 @@ mod tests {
         let result = find_tuples("then(mul(11,8)mul(8,5))");
         assert_eq!(result, vec![(11, 8), (8, 5)]);
     }
+
+    #[test]
+    fn dont_disables_tuples() {
+        let result = find_tuples("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+");
+        assert_eq!(result, vec![(2, 4)]);
+    }
+
+    #[test]
+    fn do_reenables_tuples() {
+        let result = find_tuples(
+            "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+        );
+        assert_eq!(result, vec![(2, 4), (8, 5)]);
+    }
 }
