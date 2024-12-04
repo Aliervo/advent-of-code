@@ -1,6 +1,10 @@
 use std::error::Error;
 use std::fs;
 
+mod day_1;
+mod day_2;
+mod day_3;
+
 pub struct Config {
     pub day: u8,
     pub file_path: String,
@@ -24,88 +28,6 @@ impl Config {
     }
 }
 
-struct ListStats {
-    distance: u32,
-    similarity: u32,
-}
-
-fn day_1<'a>(lines: impl Iterator<Item = &'a str>) -> ListStats {
-    // Split into two vectors
-    let mut first: Vec<u32> = Vec::new();
-    let mut second: Vec<u32> = Vec::new();
-
-    for line in lines {
-        let mut words = line.split_whitespace();
-        first.push(
-            words
-                .next()
-                .expect("The line was blank")
-                .parse::<u32>()
-                .expect("That wasn't a number"),
-        );
-        second.push(
-            words
-                .next()
-                .expect("The line was blank")
-                .parse::<u32>()
-                .expect("That wasn't a number"),
-        );
-    }
-
-    first.sort();
-    second.sort();
-
-    let similarity: u32 = first.iter().fold(0, |acc, x| {
-        let mut count = 0;
-        for num in &second {
-            if num == x {
-                count += 1;
-            }
-        }
-        x * count + acc
-    });
-
-    let zipped = first.iter().zip(second.iter());
-
-    let distance: u32 = zipped.fold(0, |acc, (a, b)| acc + a.abs_diff(*b));
-
-    ListStats {
-        distance,
-        similarity,
-    }
-}
-
-fn parse_list(list: &str) -> Vec<u8> {
-    list.split_whitespace()
-        .map(|x| x.parse::<u8>().expect("That wasn't a number"))
-        .collect()
-}
-
-fn is_safe(numbers: &Vec<u8>) -> bool {
-    same_direction(numbers) && correct_velocity(numbers)
-}
-
-/// Returns true if all numbers are either increasing or decreasing
-/// Repeated numbers are neither, return false on them
-fn same_direction(list: &Vec<u8>) -> bool {
-    list.is_sorted_by(|a, b| a > b) || list.is_sorted_by(|a, b| a < b)
-}
-
-/// Returns true if each adjacent number differs by at least one and at most 3
-fn correct_velocity(list: &Vec<u8>) -> bool {
-    list.windows(2).all(|w| w[0].abs_diff(w[1]) <= 3)
-}
-
-fn dampened(numbers: &Vec<u8>) -> bool {
-    // println!("Attempting to dampen: {:?}", numbers);
-    numbers.iter().enumerate().any(|(i, _)| {
-        let mut vec = numbers.clone();
-        vec.remove(i);
-        // println!("  Checking {:?}", vec);
-        is_safe(&vec.to_vec())
-    })
-}
-
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
@@ -114,98 +36,22 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     match config.day {
         1 => {
-            let stats = day_1(lines);
+            let stats = day_1::get_stats(lines);
 
             println!("Distance: {}", stats.distance);
             println!("Similarity: {}", stats.similarity);
         }
         2 => {
             let total_safe = lines.fold(0, |acc, line| {
-                let vec = parse_list(line);
-                acc + (is_safe(&vec) || dampened(&vec)) as u32
+                let vec = day_2::parse_list(line);
+                acc + (day_2::is_safe(&vec) || day_2::dampened(&vec)) as u32
             });
 
             println!("There were {total_safe} safe lines");
         }
+        3 => println!("Day 3, let's go!"),
         day => println!("No logic for day {day}"),
     }
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn decreasing() {
-        let result = is_safe(&parse_list("7 6 4 2 1"));
-        assert_eq!(true, result);
-    }
-
-    #[test]
-    fn increases_too_quickly() {
-        let result = is_safe(&parse_list("1 2 7 8 9"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn decreases_too_quickly() {
-        let result = is_safe(&parse_list("9 7 6 2 1"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn direction_change() {
-        let result = is_safe(&parse_list("1 3 2 4 5"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn no_direction() {
-        let result = is_safe(&parse_list("8 6 4 4 1"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn ends_without_direction() {
-        let result = is_safe(&parse_list("1 3 6 8 8"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn increase_by_3() {
-        let result = is_safe(&parse_list("1 3 6 7 9"));
-        assert_eq!(true, result);
-    }
-
-    #[test]
-    fn dampen_out_of_order() {
-        let result = dampened(&parse_list("1 3 2 4 5"));
-        assert_eq!(true, result);
-    }
-
-    #[test]
-    fn cannot_dampen() {
-        let result = dampened(&parse_list("9 7 6 2 1"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn cannot_dampen_2() {
-        let result = dampened(&parse_list("1 2 7 8 9"));
-        assert_eq!(false, result);
-    }
-
-    #[test]
-    fn dampen_repeat() {
-        let result = dampened(&parse_list("8 6 4 4 1"));
-        assert_eq!(true, result);
-    }
-
-    #[test]
-    fn dampen_end_out_of_order() {
-        let result = dampened(&parse_list("1 3 6 8 6"));
-        assert_eq!(true, result);
-    }
 }
