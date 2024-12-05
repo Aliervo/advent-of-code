@@ -4,6 +4,7 @@ use std::fs;
 mod day_1;
 mod day_2;
 mod day_3;
+mod day_4;
 
 pub struct Config {
     pub day: u8,
@@ -54,6 +55,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
             println!("The total is {total}");
         }
+        4 => println!("BeFOUR you know it!"),
         day => println!("No logic for day {day}"),
     }
 
