@@ -55,7 +55,11 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
             println!("The total is {total}");
         }
-        4 => println!("BeFOUR you know it!"),
+        4 => {
+            let total = day_4::find_xmas(day_4::enter_the_matrix(lines));
+
+            println!("The total is {total}");
+        }
         day => println!("No logic for day {day}"),
     }
 
