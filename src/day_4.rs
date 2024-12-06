@@ -138,36 +138,39 @@ pub fn find_cross_mas(matrix: Vec<IndexedVec>) -> u32 {
     //  8[M.M.M.M.M.]
     //  9[..........]]
 
+    let upper_bound = matrix.len() - 1;
+
     matrix.iter().fold(0, |mut acc, indexed_line| {
         let line = indexed_line.index;
         let vec = &indexed_line.vector;
-        for item in vec {
-            let position = item.index;
-            let letter = item.character;
-            if letter == 'A' {
-                // println!("Found A at ({},{})", line, position);
-                let coords = search_corners([line, position], 'M', &matrix);
-                // println!("Found corner M at {:?}", coords);
-                if coords.len() == 2 {
-                    // println!("Checking other corners for S");
-                    if coords.iter().all(|coord| {
-                        let upper_bound = matrix.len() as isize;
-                        let [delta_x, delta_y] = [
-                            line as isize - coord[0] as isize,
-                            position as isize - coord[1] as isize,
-                        ];
 
-                        let next_x = coord[0] as isize + 2 * delta_x;
-                        let next_y = coord[1] as isize + 2 * delta_y;
+        // The first and last lines can't contain a middle A
+        if line != 0 && line < upper_bound {
+            for item in vec {
+                let position = item.index;
+                let letter = item.character;
+                if letter == 'A' && position != 0 && position < upper_bound {
+                    // println!("Found A at ({},{})", line, position);
+                    let coords = search_corners([line, position], 'M', &matrix);
+                    // println!("Found corner M at {:?}", coords);
+                    if coords.len() == 2 {
+                        // println!("Checking other corners for S");
+                        if coords.iter().all(|coord| {
+                            let [delta_x, delta_y] = [
+                                line as isize - coord[0] as isize,
+                                position as isize - coord[1] as isize,
+                            ];
 
-                        // println!("S could be at ({}, {})", next_x, next_y);
+                            let next_x = coord[0] as isize + 2 * delta_x;
+                            let next_y = coord[1] as isize + 2 * delta_y;
 
-                        !next_x.is_negative() && !next_y.is_negative() // Check lower bounds
-                            && next_x < upper_bound && next_y < upper_bound // Check upper bounds
-                            && matrix[next_x as usize].vector[next_y as usize].character == 'S'
-                    }) {
-                        // println!("  Increasing counter!");
-                        acc += 1;
+                            // println!("S could be at ({}, {})", next_x, next_y);
+
+                            matrix[next_x as usize].vector[next_y as usize].character == 'S'
+                        }) {
+                            // println!("  Increasing counter!");
+                            acc += 1;
+                        }
                     }
                 }
             }
