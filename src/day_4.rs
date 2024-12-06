@@ -150,9 +150,9 @@ pub fn find_cross_mas(matrix: Vec<IndexedVec>) -> u32 {
                 let position = item.index;
                 let letter = item.character;
                 if letter == 'A' && position != 0 && position < upper_bound {
-                    println!("Found A at ({},{})", line, position);
+                    // println!("Found A at ({},{})", line, position);
                     let coords = search_corners([line, position], 'M', &matrix);
-                    println!("Found corner M at {:?}", coords);
+                    // println!("Found corner M at {:?}", coords);
                     if coords.len() == 2 {
                         // println!("Checking other corners for S");
                         if coords.iter().all(|coord| {
