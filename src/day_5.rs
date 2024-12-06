@@ -1,3 +1,13 @@
+// Parse the data
+// Filter the list of lists such that only lists which obey all rules remain -> use .all(|e|)
+//  -- .split matching the value, giving a before and after iter
+//    -- .split(|p| p == e) -> iter.next().unwrap() x2
+//  -- .all both of those to see if the respective rule .contains them
+//    -- above assumes non-empty
+//    -- before.all(|n| rules[e].after.contains(n)) && after.all(...
+// Fold result starting at 0 finding the middle number with .len() / 2 and adding
+//  -- result.fold(0, |acc, vec| acc + vec[vec.len() / 2])
+
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
@@ -43,18 +53,21 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
     (rules, pages)
 }
 
+fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
+    vec![vec![0]]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn input_parses_properly() {
-        let rules = HashMap::from([
+    fn mock_data() -> (HashMap<u16, Rules>, Vec<Vec<u16>>) {
+        let test_rules = HashMap::from([
             (
                 47,
                 Rules {
                     before: vec![53],
-                    after: vec![],
+                    after: vec![97],
                 },
             ),
             (
@@ -67,7 +80,7 @@ mod tests {
             (
                 97,
                 Rules {
-                    before: vec![13],
+                    before: vec![13, 47],
                     after: vec![],
                 },
             ),
@@ -79,9 +92,21 @@ mod tests {
                 },
             ),
         ]);
-        let pages = vec![vec![47, 53, 97, 13], vec![97, 53, 47, 13]];
+        let test_pages = vec![vec![97, 47, 53], vec![97, 53, 47]];
 
-        let result = split_rules_and_pages("47|53\n97|13\n\n47,53,97,13\n97,53,47,13");
-        assert_eq!(result, (rules, pages))
+        (test_rules, test_pages)
+    }
+
+    #[test]
+    fn input_parses_properly() {
+        let result = split_rules_and_pages("47|53\n97|13\n97|47\n\n97,47,53\n97,53,47");
+        assert_eq!(result, mock_data());
+    }
+
+    #[test]
+    fn incorrect_lists_are_removed() {
+        let (rules, pages) = mock_data();
+        let result = find_good_lists(rules, pages);
+        assert_eq!(result, vec![vec![97, 47, 53]]);
     }
 }
