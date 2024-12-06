@@ -150,9 +150,9 @@ pub fn find_cross_mas(matrix: Vec<IndexedVec>) -> u32 {
                 let position = item.index;
                 let letter = item.character;
                 if letter == 'A' && position != 0 && position < upper_bound {
-                    // println!("Found A at ({},{})", line, position);
+                    println!("Found A at ({},{})", line, position);
                     let coords = search_corners([line, position], 'M', &matrix);
-                    // println!("Found corner M at {:?}", coords);
+                    println!("Found corner M at {:?}", coords);
                     if coords.len() == 2 {
                         // println!("Checking other corners for S");
                         if coords.iter().all(|coord| {
@@ -184,23 +184,13 @@ fn search_corners(
     searchee: char,
     search_area: &Vec<IndexedVec>,
 ) -> Vec<[usize; 2]> {
-    // An item is adjacent if it is one away, but it cannot cross boundaries
-    let furthest_column = search_area[0].vector.len();
-    let deepest_row = search_area.len();
     let [row, col] = coord;
     const CORNERS: [(isize, isize); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
 
     CORNERS.iter().fold(Vec::new(), |mut acc, (x, y)| {
         let loc = [x + row as isize, y + col as isize];
-        if loc[0] >= 0
-            && (loc[0] + 1 < furthest_column as isize)
-            && loc[1] >= 0
-            && (loc[1] + 1 < deepest_row as isize)
-        {
-            // println! {"Checking corner ({}, {})", loc[0], loc[1]};
-            if search_area[loc[0] as usize].vector[loc[1] as usize].character == searchee {
-                acc.push([loc[0] as usize, loc[1] as usize]);
-            }
+        if search_area[loc[0] as usize].vector[loc[1] as usize].character == searchee {
+            acc.push([loc[0] as usize, loc[1] as usize]);
         }
         acc
     })
