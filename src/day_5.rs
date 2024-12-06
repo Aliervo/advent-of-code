@@ -2,9 +2,10 @@
 // Filter the list of lists such that only lists which obey all rules remain -> use .all(|e|)
 //  -- .split matching the value, giving a before and after iter
 //    -- .split(|p| p == e) -> iter.next().unwrap() x2
-//  -- .all both of those to see if the respective rule .contains them
+//  -- .all both of those to see if the respective rule DOES NOT .contains them -> Looking for
+//  violations
 //    -- above assumes non-empty
-//    -- before.all(|n| rules[e].after.contains(n)) && after.all(...
+//    -- before.all(|n| !rules[e].before.contains(n)) && after.all(...
 // Fold result starting at 0 finding the middle number with .len() / 2 and adding
 //  -- result.fold(0, |acc, vec| acc + vec[vec.len() / 2])
 
@@ -54,7 +55,25 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
 }
 
 fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
-    vec![vec![0]]
+    list_of_lists
+        .into_iter()
+        .filter(|list| {
+            list.into_iter().all(|page| {
+                let mut split = list.split(|p| p == page);
+                let is_behind = split.next().unwrap();
+                let in_front_of = split.next().unwrap();
+
+                (is_behind.is_empty()
+                    || is_behind
+                        .into_iter()
+                        .all(|n| !rules[&page].before.contains(n)))
+                    && (in_front_of.is_empty()
+                        || in_front_of
+                            .into_iter()
+                            .all(|n| !rules[&page].after.contains(n)))
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
