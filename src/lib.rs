@@ -66,8 +66,8 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         5 => {
             let (rules, pages) = day_5::split_rules_and_pages(&contents);
             let good_lists = day_5::find_good_lists(rules, pages);
-            let sum_of_mid = good_lists
-                .into_iter()
+            let sum_of_mid = good_lists[&String::from("correct")]
+                .iter()
                 .fold(0, |acc, list| acc + list[list.len() / 2]);
 
             println!("Sum of the middle pages is {sum_of_mid}");

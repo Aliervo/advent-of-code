@@ -54,11 +54,17 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
     (rules, pages)
 }
 
-pub fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
-    list_of_lists
-        .into_iter()
-        .filter(|list| {
-            list.into_iter().all(|page| {
+pub fn find_good_lists(
+    rules: HashMap<u16, Rules>,
+    list_of_lists: Vec<Vec<u16>>,
+) -> HashMap<String, Vec<Vec<u16>>> {
+    list_of_lists.into_iter().fold(
+        HashMap::from([
+            (String::from("correct"), Vec::new()),
+            (String::from("incorrect"), Vec::new()),
+        ]),
+        |mut acc, list| {
+            if list.iter().all(|page| {
                 let mut split = list.split(|p| p == page);
                 let is_behind = split.next().unwrap();
                 let in_front_of = split.next().unwrap();
@@ -71,9 +77,16 @@ pub fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>)
                         || in_front_of
                             .into_iter()
                             .all(|n| !rules[&page].after.contains(n)))
-            })
-        })
-        .collect()
+            }) {
+                let good_lists = acc.entry(String::from("correct")).or_default();
+                good_lists.push(list);
+            } else {
+                let bad_lists = acc.entry(String::from("incorrect")).or_default();
+                bad_lists.push(list);
+            }
+            acc
+        },
+    )
 }
 
 #[cfg(test)]
@@ -123,9 +136,10 @@ mod tests {
     }
 
     #[test]
-    fn incorrect_lists_are_removed() {
+    fn finds_correct_and_incorrect() {
         let (rules, pages) = mock_data();
         let result = find_good_lists(rules, pages);
-        assert_eq!(result, vec![vec![97, 47, 53]]);
+        assert_eq!(result[&String::from("correct")], vec![vec![97, 47, 53]]);
+        assert_eq!(result[&String::from("incorrect")], vec![vec![97, 53, 47]]);
     }
 }
