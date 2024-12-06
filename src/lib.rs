@@ -64,8 +64,13 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             println!("Total X-MAS: {cross_mas}");
         }
         5 => {
-            let total = day_5::split_rules_and_pages(&contents);
-            println!("{:?}", total);
+            let (rules, pages) = day_5::split_rules_and_pages(&contents);
+            let good_lists = day_5::find_good_lists(rules, pages);
+            let sum_of_mid = good_lists
+                .into_iter()
+                .fold(0, |acc, list| acc + list[list.len() / 2]);
+
+            println!("Sum of the middle pages is {sum_of_mid}");
         }
         day => println!("No logic for day {day}"),
     }

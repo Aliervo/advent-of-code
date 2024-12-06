@@ -41,7 +41,7 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
             }
             acc
         });
-    println!("{:?}", rules);
+    // println!("{:?}", rules);
 
     let pages: Vec<Vec<u16>> = iter
         .next()
@@ -49,12 +49,12 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
         .split_whitespace()
         .map(|x| x.split(',').map(|n| n.parse::<u16>().unwrap()).collect())
         .collect();
-    println!("{:?}", pages);
+    // println!("{:?}", pages);
 
     (rules, pages)
 }
 
-fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
+pub fn find_good_lists(rules: HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
     list_of_lists
         .into_iter()
         .filter(|list| {
