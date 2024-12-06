@@ -94,27 +94,6 @@ pub fn fix_lists(rules: &HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> V
     list_of_lists
         .into_iter()
         .map(|mut list| {
-            // Strategy:
-            // * Iterate through, checking if each element is in the correct position
-            // * When a bad element is found, take it out of the original list
-            // * Once all remaining elements are good, iterate through the list of bad elements to find
-            // their places
-            // * split the good list based on the before and after lists and then join them with
-            // the element in between
-            // * To split:
-            // * use chunk_by a AND b contained in before/after list
-            // * reconnect with .join(bad_element)
-            /*  let mut good_pages = Vec::new();
-            let mut bad_pages = Vec::new();
-            for page in list {
-                if check_page(page, list, rules) {
-                    good_pages.push(page);
-                } else {
-                    bad_pages.push(page);
-                }
-            }
-             */
-
             list.sort_by(|a, b| {
                 if rules[a].before.contains(b) {
                     Ordering::Less
@@ -122,7 +101,6 @@ pub fn fix_lists(rules: &HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> V
                     Ordering::Greater
                 }
             });
-
             list
         })
         .collect()
