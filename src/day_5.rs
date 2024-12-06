@@ -9,6 +9,7 @@
 // Fold result starting at 0 finding the middle number with .len() / 2 and adding
 //  -- result.fold(0, |acc, vec| acc + vec[vec.len() / 2])
 
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
@@ -55,7 +56,7 @@ pub fn split_rules_and_pages(string: &str) -> (HashMap<u16, Rules>, Vec<Vec<u16>
 }
 
 pub fn find_good_lists(
-    rules: HashMap<u16, Rules>,
+    rules: &HashMap<u16, Rules>,
     list_of_lists: Vec<Vec<u16>>,
 ) -> HashMap<String, Vec<Vec<u16>>> {
     list_of_lists.into_iter().fold(
@@ -87,6 +88,44 @@ pub fn find_good_lists(
             acc
         },
     )
+}
+
+pub fn fix_lists(rules: &HashMap<u16, Rules>, list_of_lists: Vec<Vec<u16>>) -> Vec<Vec<u16>> {
+    list_of_lists
+        .into_iter()
+        .map(|mut list| {
+            // Strategy:
+            // * Iterate through, checking if each element is in the correct position
+            // * When a bad element is found, take it out of the original list
+            // * Once all remaining elements are good, iterate through the list of bad elements to find
+            // their places
+            // * split the good list based on the before and after lists and then join them with
+            // the element in between
+            // * To split:
+            // * use chunk_by a AND b contained in before/after list
+            // * reconnect with .join(bad_element)
+            /*  let mut good_pages = Vec::new();
+            let mut bad_pages = Vec::new();
+            for page in list {
+                if check_page(page, list, rules) {
+                    good_pages.push(page);
+                } else {
+                    bad_pages.push(page);
+                }
+            }
+             */
+
+            list.sort_by(|a, b| {
+                if rules[a].before.contains(b) {
+                    Ordering::Less
+                } else {
+                    Ordering::Greater
+                }
+            });
+
+            list
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -138,8 +177,15 @@ mod tests {
     #[test]
     fn finds_correct_and_incorrect() {
         let (rules, pages) = mock_data();
-        let result = find_good_lists(rules, pages);
+        let result = find_good_lists(&rules, pages);
         assert_eq!(result[&String::from("correct")], vec![vec![97, 47, 53]]);
         assert_eq!(result[&String::from("incorrect")], vec![vec![97, 53, 47]]);
+    }
+
+    #[test]
+    fn fixes_bad_list() {
+        let (rules, _) = mock_data();
+        let result = fix_lists(&rules, vec![vec![97, 53, 47]]);
+        assert_eq!(result, vec![vec![97, 47, 53]]);
     }
 }

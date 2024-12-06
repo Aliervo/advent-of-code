@@ -65,12 +65,17 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         }
         5 => {
             let (rules, pages) = day_5::split_rules_and_pages(&contents);
-            let good_lists = day_5::find_good_lists(rules, pages);
-            let sum_of_mid = good_lists[&String::from("correct")]
+            let checked_lists = day_5::find_good_lists(&rules, pages);
+            let sum_of_mid = checked_lists[&String::from("correct")]
                 .iter()
                 .fold(0, |acc, list| acc + list[list.len() / 2]);
+            let sum_of_fixed =
+                day_5::fix_lists(&rules, checked_lists[&String::from("incorrect")].clone())
+                    .iter()
+                    .fold(0, |acc, list| acc + list[list.len() / 2]);
 
-            println!("Sum of the middle pages is {sum_of_mid}");
+            println!("Sum of the middle pages in correct lists is {sum_of_mid}");
+            println!("Sum of the middle pages in fixed lists is {sum_of_fixed}");
         }
         day => println!("No logic for day {day}"),
     }
