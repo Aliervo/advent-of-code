@@ -63,7 +63,10 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             println!("Total XMAS: {xmas}");
             println!("Total X-MAS: {cross_mas}");
         }
-        5 => println!("5 down, 20 to go!"),
+        5 => {
+            let total = day_5::split_rules_and_pages(&contents);
+            println!("{:?}", total);
+        }
         day => println!("No logic for day {day}"),
     }
 
