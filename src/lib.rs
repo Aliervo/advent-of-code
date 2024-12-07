@@ -6,6 +6,7 @@ mod day_2;
 mod day_3;
 mod day_4;
 mod day_5;
+mod day_6;
 
 pub struct Config {
     pub day: u8,
@@ -76,6 +77,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
             println!("Sum of the middle pages in correct lists is {sum_of_mid}");
             println!("Sum of the middle pages in fixed lists is {sum_of_fixed}");
+        }
+        6 => {
+            println!("Solving puzzles is as good as a pick six!")
         }
         day => println!("No logic for day {day}"),
     }
